@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WP Rechner">
+<title>WP Rechner 2.0</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#0f1117;--bg2:#181c27;--bg3:#1e2336;--border:#2a3050;--text:#e8eaf0;--text2:#8b91a8;--blue:#4a9eff;--green:#3ecf8e;--red:#ff5c5c;--orange:#ffb347;--yellow:#ffd600;--accent:#5b8cff;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;font-size:15px;overscroll-behavior:none;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 10px;background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+.topbar-title{font-size:20px;font-weight:700;}
+.topbar-icons{display:flex;gap:14px;}
+.topbar-icons button{background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;padding:2px;}
+.tabs{display:flex;background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:57px;z-index:99;}
+.tab{flex:1;padding:10px 4px 9px;text-align:center;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;}
+.tab.active{color:var(--blue);border-bottom-color:var(--blue);}
+.tab-icon{font-size:14px;margin-bottom:2px;}
+.content{padding:16px 14px 100px;max-width:520px;margin:0 auto;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;}
+.card-title{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:14px;letter-spacing:0.6px;text-transform:uppercase;}
+.field{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);gap:10px;}
+.field:last-child{border-bottom:none;padding-bottom:0;}
+.field:first-child{padding-top:0;}
+.field-label{font-size:14px;color:var(--text);flex:1;line-height:1.3;}
+.field-unit{font-size:11px;color:var(--text2);margin-left:3px;white-space:nowrap;}
+.badge{font-size:10px;color:var(--text2);font-weight:400;margin-left:5px;}
+.field-input{background:transparent;border:none;border-bottom:1.5px solid var(--blue);color:var(--text);font-size:15px;font-weight:500;text-align:right;width:90px;padding:2px 4px;outline:none;-webkit-appearance:none;}
+.field-input.wide{width:130px;}
+.field-select{background:var(--bg3);border:1px solid var(--border);color:var(--text);font-size:13px;padding:5px 8px;border-radius:6px;outline:none;cursor:pointer;max-width:160px;}
+.field-toggle{position:relative;width:44px;height:26px;flex-shrink:0;}
+.field-toggle input{opacity:0;width:0;height:0;position:absolute;}
+.toggle-slider{position:absolute;inset:0;background:var(--bg3);border-radius:13px;transition:.2s;cursor:pointer;}
+.toggle-slider::after{content:'';position:absolute;left:3px;top:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.2s;}
+.field-toggle input:checked + .toggle-slider{background:var(--blue);}
+.field-toggle input:checked + .toggle-slider::after{transform:translateX(18px);}
+.btn-group{display:flex;gap:6px;}
+.btn-choice{flex:1;padding:7px 4px;border-radius:7px;border:1.5px solid var(--border);background:transparent;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;text-align:center;}
+.btn-choice.active{border-color:var(--blue);color:var(--blue);background:#0d2040;}
+.result-box{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--bg3);border-radius:8px;margin-bottom:7px;}
+.result-label{font-size:13px;color:var(--text2);}
+.result-value{font-size:15px;font-weight:700;padding:3px 9px;border-radius:5px;min-width:68px;text-align:center;}
+.val-blue{background:#0d2040;color:var(--blue);}
+.val-green{background:#0a2a1e;color:var(--green);}
+.val-red{background:#2a0d0d;color:var(--red);}
+.val-orange{background:#2a1a00;color:var(--orange);}
+.val-yellow{background:#2a2000;color:var(--yellow);}
+.monthly-row{display:flex;gap:8px;margin-bottom:14px;}
+.monthly-box{flex:1;background:var(--bg3);border-radius:10px;padding:11px;text-align:center;}
+.monthly-val{font-size:20px;font-weight:800;}
+.monthly-lbl{font-size:10px;color:var(--text2);margin-top:3px;}
+.highlight-card{background:var(--bg3);border-radius:12px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.amort-value{font-size:22px;font-weight:800;color:var(--yellow);}
+.chart-wrap{position:relative;height:190px;margin-top:10px;}
+.chart-wrap-tall{position:relative;height:230px;margin-top:10px;}
+.donut-row{display:flex;align-items:center;gap:14px;margin-bottom:10px;}
+.donut-wrap{width:96px;height:96px;flex-shrink:0;position:relative;}
+.donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;}
+.donut-pct{font-size:17px;font-weight:800;color:var(--green);}
+.donut-sub{font-size:10px;color:var(--text2);}
+.donut-legend{flex:1;display:flex;flex-direction:column;gap:6px;}
+.legend-item{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text2);}
+.legend-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.section-header{font-size:16px;font-weight:700;margin:18px 0 10px;color:var(--text);}
+.section-header:first-child{margin-top:0;}
+.info-banner{background:#0d2040;border:1px solid var(--blue);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12.5px;color:var(--blue);line-height:1.5;}
+.warn-banner{background:#2a1a00;border:1px solid var(--orange);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12.5px;color:var(--orange);line-height:1.5;}
+.note{font-size:12px;color:var(--text2);margin-top:6px;line-height:1.5;}
+.fab{position:fixed;bottom:24px;right:20px;width:54px;height:54px;border-radius:27px;background:var(--accent);border:none;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 4px 20px rgba(91,140,255,0.5);z-index:200;display:flex;align-items:center;justify-content:center;}
+.geraet-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;cursor:pointer;}
+.geraet-card.selected{border-color:var(--blue);background:#0d2040;}
+.geraet-name{font-size:14px;font-weight:700;}
+.geraet-sub{font-size:12px;color:var(--text2);margin-top:3px;}
+.geraet-cop{display:flex;gap:7px;margin-top:8px;flex-wrap:wrap;}
+.cop-badge{font-size:11px;padding:2px 7px;border-radius:4px;background:var(--bg2);color:var(--text2);}
+.btn-primary{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:14px;font-weight:600;cursor:pointer;width:100%;margin-top:8px;}
+.btn-danger{background:#2a0d0d;color:var(--red);border:1px solid #5a1a1a;border-radius:7px;padding:6px 12px;font-size:12px;cursor:pointer;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:500;align-items:flex-end;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:18px 18px 0 0;padding:20px 18px 40px;width:100%;max-width:520px;max-height:85vh;overflow-y:auto;}
+.modal-title{font-size:17px;font-weight:700;margin-bottom:16px;}
+.modal-close{float:right;background:none;border:none;color:var(--text2);font-size:22px;cursor:pointer;margin-top:-4px;}
+.upload-zone{border:2px dashed var(--border);border-radius:10px;padding:22px;text-align:center;cursor:pointer;margin-bottom:12px;}
+.upload-zone input{display:none;}
+.cop-table{width:100%;border-collapse:collapse;margin-top:8px;}
+.cop-table th{font-size:11px;color:var(--text2);padding:5px 8px;text-align:left;border-bottom:1px solid var(--border);}
+.cop-table td{padding:7px 8px;font-size:13px;border-bottom:1px solid var(--border);}
+.cop-table input{background:transparent;border:none;border-bottom:1px solid var(--blue);color:var(--text);width:60px;text-align:center;font-size:13px;outline:none;}
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.hidden{display:none!important;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-title">&#9889; WP Rechner 2.0</div>
+  <div class="topbar-icons">
+    <button onclick="resetAll()">&#8635;</button>
+    <button onclick="showHelp()">?</button>
+  </div>
+</div>
+<div class="tabs">
+  <div class="tab active" onclick="switchTab(0)"><div class="tab-icon">&#127968;</div>Projekt</div>
+  <div class="tab" onclick="switchTab(1)"><div class="tab-icon">&#127777;&#65039;</div>W&#228;rmepumpe</div>
+  <div class="tab" onclick="switchTab(2)"><div class="tab-icon">&#128202;</div>Auswertung</div>
+  <div class="tab" onclick="switchTab(3)"><div class="tab-icon">&#128452;&#65039;</div>Ger&#228;te</div>
+</div>
+<div class="content">
+
+<!-- TAB 0: PROJEKT -->
+<div class="tab-panel active" id="panel-0">
+  <div class="card">
+    <div class="card-title">Projektdaten</div>
+    <div class="field"><div class="field-label">Kundenname</div><input class="field-input wide" type="text" id="p_name" placeholder="Mustermann"></div>
+    <div class="field"><div class="field-label">Adresse <span class="badge">(opt.)</span></div><input class="field-input wide" type="text" id="p_adresse" placeholder="Ort"></div>
+    <div class="field"><div class="field-label">Wohnfl&#228;che <span class="field-unit">[m&#178;]</span></div><input class="field-input" type="number" id="p_flaeche" placeholder="150"></div>
+    <div class="field"><div class="field-label">Personen</div><input class="field-input" type="number" id="p_personen" placeholder="3"></div>
+    <div class="field"><div class="field-label">Baujahr Geb&#228;ude</div><input class="field-input" type="number" id="p_baujahr" placeholder="1992"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Heizlast</div>
+    <div class="info-banner">&#128161; Heizlast aus BWP-Heizlastrechner (bwp.de) eintragen.</div>
+    <div class="field"><div class="field-label">Heizlast (Norm) <span class="field-unit">[kW]</span></div><input class="field-input" type="number" id="p_heizlast" placeholder="8.0" step="0.1"></div>
+    <div class="field">
+      <div class="field-label">Aktuelle Vorlauftemperatur</div>
+      <select class="field-select" id="p_vorlauf" onchange="updateVorlaufHinweis()">
+        <option value="35">35&#176;C &#8211; Fu&#223;boden (optimal)</option>
+        <option value="45">45&#176;C &#8211; Fu&#223;boden/Gemischt</option>
+        <option value="55" selected>55&#176;C &#8211; Heizk&#246;rper niedrig</option>
+        <option value="65">65&#176;C &#8211; Heizk&#246;rper mittel</option>
+        <option value="70">70&#176;C &#8211; Heizk&#246;rper hoch &#9888;&#65039;</option>
+        <option value="75">75&#176;C &#8211; sehr hoch &#9888;&#65039;&#9888;&#65039;</option>
+      </select>
+    </div>
+    <div id="vorlauf_hinweis" class="hidden warn-banner">&#9888;&#65039; Hohe Vorlauftemperatur erkannt. Der reale COP wird deutlich reduziert. Eine Heizkostenoptimierung kann die Effizienz erheblich steigern.</div>
+  </div>
+  <div class="card">
+    <div class="card-title">Aktueller Energietr&#228;ger</div>
+    <div class="field" style="flex-direction:column;align-items:stretch;gap:10px;">
+      <div class="field-label">Energietr&#228;ger</div>
+      <div class="btn-group">
+        <button class="btn-choice active" id="btn_gas" onclick="setEnergie('gas')">&#128293; Gas</button>
+        <button class="btn-choice" id="btn_oel" onclick="setEnergie('oel')">&#128707; &#214;l</button>
+        <button class="btn-choice" id="btn_strom" onclick="setEnergie('strom')">&#9889; Strom</button>
+      </div>
+    </div>
+    <div id="block_gas">
+      <div class="field"><div class="field-label">Gasverbrauch <span class="field-unit">[kWh/Jahr]</span></div><input class="field-input" type="number" id="gas_kwh" placeholder="20000" oninput="syncGas('kwh')"></div>
+      <div class="field"><div class="field-label">&#8230; oder in m&#179;</div><input class="field-input" type="number" id="gas_m3" placeholder="1900" oninput="syncGas('m3')"></div>
+      <div class="field"><div class="field-label">Gaspreis <span class="field-unit">[&#8364;/kWh]</span></div><input class="field-input" type="number" id="gas_preis" placeholder="0.112" step="0.001" value="0.112"></div>
+    </div>
+    <div id="block_oel" class="hidden">
+      <div class="field"><div class="field-label">&#214;lverbrauch <span class="field-unit">[Liter/Jahr]</span></div><input class="field-input" type="number" id="oel_liter" placeholder="3000" oninput="calcOel()"></div>
+      <div class="field"><div class="field-label">Gesamtkosten &#214;l <span class="field-unit">[&#8364;/Jahr]</span></div><input class="field-input" type="number" id="oel_kosten" placeholder="2700" oninput="calcOel()"></div>
+      <div class="field"><div class="field-label">= &#214;lpreis</div><div class="result-value val-blue" id="oel_preis_display" style="font-size:13px;">&#8212; &#8364;/L</div></div>
+      <div class="field"><div class="field-label">= Verbrauch kWh</div><div class="result-value val-blue" id="oel_kwh_display" style="font-size:13px;">&#8212; kWh</div></div>
+    </div>
+    <div id="block_strom" class="hidden">
+      <div class="field"><div class="field-label">Stromverbrauch Heizung <span class="field-unit">[kWh/Jahr]</span></div><input class="field-input" type="number" id="strom_kwh" placeholder="5000"></div>
+      <div class="field"><div class="field-label">Strompreis aktuell <span class="field-unit">[&#8364;/kWh]</span></div><input class="field-input" type="number" id="strom_preis_alt" placeholder="0.32" step="0.001"></div>
+    </div>
+
+  </div>
+  <div class="card">
+    <div class="card-title">Umrechnungsfaktor</div>
+    <div class="field">
+      <div class="field-label">Korrekturfaktor Altanlage</div>
+      <input class="field-input" type="number" id="korrfaktor" placeholder="0.8" step="0.01" value="0.8">
+    </div>
+    <p class="note">&#128161; Standard 0,8 = Nutzungsgrad der alten Gas-/&#214;lheizung. Bei neuerer Anlage (&lt; 10 J.) eher 0,85&#8211;0,87. Formel: Verbrauch &#215; Faktor &#247; COP = WP-Stromverbrauch.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Preisentwicklung &amp; Grundkosten</div>
+    <div class="info-banner" style="font-size:11.5px;">&#128200; Standardwerte basieren auf CO&#8322;-Steuer-Entwicklung (ETS 2 ab 2028) + steigenden Netzentgelten. Anpassbar.</div>
+    <div class="field">
+      <div class="field-label">Gaspreis&#228;nderung <span class="field-unit">[%/Jahr]</span></div>
+      <input class="field-input" type="number" id="gas_delta" placeholder="6" step="0.5" value="6">
+    </div>
+    <div class="field">
+      <div class="field-label">&#214;lpreis&#228;nderung <span class="field-unit">[%/Jahr]</span></div>
+      <input class="field-input" type="number" id="oel_delta" placeholder="7" step="0.5" value="7">
+    </div>
+    <div class="field">
+      <div class="field-label">Grundpreis / Z&#228;hlergeb&#252;hr <span class="field-unit">[&#8364;/Jahr]</span></div>
+      <input class="field-input" type="number" id="grundpreis" placeholder="196.24" step="0.01" value="196.24">
+    </div>
+    <p class="note">&#128161; Grundpreis f&#228;llt beim Abmelden des Gas-/&#214;lanschlusses komplett weg &#8211; z&#228;hlt zur j&#228;hrlichen Ersparnis dazu.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Neuer Strompreis (WP-Betrieb)</div>
+    <div class="field"><div class="field-label">Strompreis <span class="field-unit">[&#8364;/kWh]</span></div><input class="field-input" type="number" id="p_strompreis" placeholder="0.32" step="0.001" value="0.32"></div>
+    <div class="field"><div class="field-label">Strompreis&#228;nderung <span class="field-unit">[%/Jahr]</span> <span class="badge">(opt.)</span></div><input class="field-input" type="number" id="p_strom_delta" placeholder="3" step="0.5" value="3"></div>
+  </div>
+</div>
+
+<!-- TAB 1: WAERMEPUMPE -->
+<div class="tab-panel" id="panel-1">
+  <div class="card">
+    <div class="card-title">Ger&#228;t</div>
+    <div id="wp_geraet_info" class="info-banner hidden"></div>
+    <button class="btn-primary" style="margin-top:0;margin-bottom:10px;" onclick="switchTab(3)">&#128203; Ger&#228;t aus Datenbank w&#228;hlen</button>
+    <p class="note" style="margin-bottom:8px;">Oder COP-Werte manuell eingeben:</p>
+    <table class="cop-table">
+      <tr><th>Betriebspunkt</th><th>Au&#223;en</th><th>Vorlauf</th><th>COP</th></tr>
+      <tr><td>A-7/W35</td><td>&#8722;7&#176;C</td><td>35&#176;C</td><td><input type="number" id="cop_am7" placeholder="2.5" step="0.1" oninput="updateCopPreview()"></td></tr>
+      <tr><td>A2/W35</td><td>+2&#176;C</td><td>35&#176;C</td><td><input type="number" id="cop_a2" placeholder="3.5" step="0.1" oninput="updateCopPreview()"></td></tr>
+      <tr><td>A7/W35</td><td>+7&#176;C</td><td>35&#176;C</td><td><input type="number" id="cop_a7" placeholder="4.2" step="0.1" oninput="updateCopPreview()"></td></tr>
+    </table>
+    <div class="field" style="margin-top:10px;"><div class="field-label">Errechneter Jahres-COP</div><div class="result-value val-green" id="cop_jahres_preview">&#8212;</div></div>
+    <div class="field"><div class="field-label">Nennleistung <span class="field-unit">[kW]</span></div><input class="field-input" type="number" id="wp_leistung" placeholder="8.0" step="0.5"></div>
+    <div class="field"><div class="field-label">WP-Typ</div>
+      <select class="field-select" id="wp_typ">
+        <option value="luft">Luft/Wasser</option>
+        <option value="sole">Sole/Wasser</option>
+        <option value="wasser">Wasser/Wasser</option>
+      </select>
+    </div>
+    <div class="field"><div class="field-label">Anzahl WP</div>
+      <select class="field-select" id="wp_anzahl">
+        <option value="1">1&#215; Standard</option>
+        <option value="2">2&#215; Kaskade</option>
+      </select>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Inneneinheit</div>
+    <div class="field" style="flex-direction:column;align-items:stretch;gap:10px;">
+      <div class="field-label">System</div>
+      <div class="btn-group">
+        <button class="btn-choice active" id="btn_kombi" onclick="setInnensystem('kombi')">&#128230; Kombi</button>
+        <button class="btn-choice" id="btn_getrennt" onclick="setInnensystem('getrennt')">&#128295; Getrennt</button>
+      </div>
+    </div>
+    <div id="kombi_info" class="note" style="margin-top:6px;">Steuerung, Puffer- und Trinkwasserspeicher in einem Geh&#228;use integriert.</div>
+    <div id="getrennt_info" class="note hidden" style="margin-top:6px;">Separate Steuereinheit + externer Pufferspeicher + externer Trinkwasserspeicher.</div>
+    <div class="field" style="margin-top:4px;">
+      <div class="field-label">Trinkwasserspeicher <span class="field-unit">[Liter]</span></div>
+      <select class="field-select" id="wp_tww">
+        <option value="0">Keiner</option>
+        <option value="150">150 L</option>
+        <option value="200" selected>200 L</option>
+        <option value="250">250 L</option>
+        <option value="270">270 L</option>
+        <option value="300">300 L</option>
+        <option value="400">400 L</option>
+        <option value="500">500 L</option>
+      </select>
+    </div>
+    <div class="field">
+      <div class="field-label">Pufferspeicher <span class="field-unit">[Liter]</span></div>
+      <select class="field-select" id="wp_puffer">
+        <option value="0">Keiner</option>
+        <option value="50">50 L</option>
+        <option value="100" selected>100 L</option>
+        <option value="150">150 L</option>
+        <option value="200">200 L</option>
+        <option value="300">300 L</option>
+      </select>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Investition &amp; F&#246;rderung</div>
+    <div class="field"><div class="field-label">Gesamtinvestition <span class="field-unit">[&#8364;]</span></div><input class="field-input" type="number" id="wp_invest" placeholder="18000" step="500" oninput="updateNetto()"></div>
+    <div class="field"><div class="field-label">BEG-F&#246;rderung <span class="field-unit">[&#8364;]</span></div><input class="field-input" type="number" id="wp_foerderung" placeholder="5400" step="100" oninput="updateNetto()"></div>
+    <div class="field"><div class="field-label">Wartung / Service <span class="field-unit">[&#8364;/Jahr]</span> <span class="badge">(opt.)</span></div><input class="field-input" type="number" id="wp_laufend" placeholder="120" step="10"></div>
+    <div class="field"><div class="field-label" style="font-weight:700;">Nettoinvestition</div><div class="result-value val-blue" id="netto_invest">&#8212;</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">&#9728;&#65039; PV-Anlage <span class="badge">(optional)</span></div>
+    <div class="field"><div class="field-label">PV vorhanden / geplant</div>
+      <label class="field-toggle"><input type="checkbox" id="pv_aktiv" onchange="togglePV()"><span class="toggle-slider"></span></label>
+    </div>
+    <div id="pv_section" class="hidden">
+      <div class="field"><div class="field-label">PV-Jahresertrag <span class="field-unit">[kWh]</span></div><input class="field-input" type="number" id="pv_ertrag" placeholder="8500" step="100"></div>
+      <div class="field"><div class="field-label">Einspeiseverg&#252;tung <span class="field-unit">[&#8364;/kWh]</span></div><input class="field-input" type="number" id="pv_einspeise" placeholder="0.071" step="0.001" value="0.071"></div>
+      <p class="note">&#128161; PV-Jahresertrag aus PV Calculator &#252;bernehmen.</p>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 2: AUSWERTUNG -->
+<div class="tab-panel" id="panel-2">
+  <div id="auswertung_placeholder" class="info-banner">&#8505;&#65039; Heizlast, Verbrauchsdaten und Strompreis eingeben, dann auf <strong>Berechnen</strong> tippen.</div>
+  <button onclick="berechnen()" style="width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:14px;">&#9654;&nbsp; Berechnen</button>
+  <div id="auswertung_content" class="hidden">
+    <div id="vorlauf_warn_auswertung" class="hidden warn-banner"></div>
+
+    <div style="display:flex;gap:6px;margin-bottom:14px;">
+      <button class="btn-choice active" id="sz_real" onclick="setSzenario('real')" style="flex:1;padding:9px 4px;font-size:12px;">&#127919; Realistisch</button>
+      <button class="btn-choice" id="sz_kons" onclick="setSzenario('kons')" style="flex:1;padding:9px 4px;font-size:12px;">&#128737;&#65039; +15%</button>
+      <button class="btn-choice" id="sz_worst" onclick="setSzenario('worst')" style="flex:1;padding:9px 4px;font-size:12px;">&#9888;&#65039; +25%</button>
+    </div>
+    <div id="szenario_hinweis" class="note" style="margin-bottom:12px;text-align:center;"></div>
+
+    <div class="section-header">&#127777;&#65039; W&#228;rmebilanz</div>
+    <div class="card">
+      <div class="result-box" style="background:var(--bg3);"><div class="result-label" style="font-weight:600;color:var(--text);">W&#228;rmebedarf gesamt <span style="font-size:10px;color:var(--text2);">(thermische Energie)</span></div><div class="result-value" style="background:#1a1a2e;color:#e8eaf0;font-size:15px;font-weight:700;padding:3px 9px;border-radius:5px;min-width:68px;text-align:center;" id="r_waerme">&#8212;</div></div>
+      <div class="result-box"><div class="result-label">davon Heizung</div><div class="result-value val-orange" id="r_heizung_kwh">&#8212;</div></div>
+      <div class="result-box"><div class="result-label">davon Warmwasser</div><div class="result-value" style="background:#0a1a2a;color:#7ec8e3;font-size:15px;font-weight:700;padding:3px 9px;border-radius:5px;min-width:68px;text-align:center;" id="r_tww_kwh">&#8212;</div></div>
+    </div>
+
+    <div class="section-header">&#9889; Energiebilanz</div>
+    <div class="monthly-row">
+      <div class="monthly-box"><div class="monthly-val" id="r_wp_strom" style="color:var(--orange);">&#8212;</div><div class="monthly-lbl">kWh/Jahr WP-Strom</div></div>
+      <div class="monthly-box"><div class="monthly-val" id="r_cop_jahres" style="color:var(--green);">&#8212;</div><div class="monthly-lbl">Jahres-COP</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">&#9889; WP-Stromverbrauch [kWh/Monat]</div>
+      <div class="chart-wrap"><canvas id="chart_verbrauch"></canvas></div>
+    </div>
+    <div id="pv_auswertung" class="hidden">
+      <div class="section-header">&#9728;&#65039; PV &#215; W&#228;rmepumpe</div>
+      <div class="card">
+        <div class="card-title">PV-Deckung W&#228;rmestrom</div>
+        <div class="donut-row">
+          <div class="donut-wrap"><canvas id="chart_donut"></canvas><div class="donut-center"><div class="donut-pct" id="donut_pct">&#8212;</div><div class="donut-sub">Deckung</div></div></div>
+          <div class="donut-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#ffd600"></div><span id="leg_direkt">&#8212;</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#ff5c5c"></div><span id="leg_netz">&#8212;</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#3ecf8e"></div><span id="leg_rest">&#8212;</span></div>
+          </div>
+        </div>
+        <div class="chart-wrap"><canvas id="chart_pv_wp"></canvas></div>
+      </div>
+    </div>
+    <div class="section-header">&#128182; Kostenvergleich</div>
+    <div class="monthly-row">
+      <div class="monthly-box"><div class="monthly-val" id="r_monat_alt" style="color:var(--red);">&#8212;</div><div class="monthly-lbl">&#8364;/Monat bisher</div></div>
+      <div class="monthly-box"><div class="monthly-val" id="r_monat_neu" style="color:var(--orange);">&#8212;</div><div class="monthly-lbl">&#8364;/Monat WP</div></div>
+      <div class="monthly-box"><div class="monthly-val" id="r_monat_diff" style="color:var(--green);">&#8212;</div><div class="monthly-lbl">&#8364;/Monat Ersparnis</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Jahreskosten</div>
+      <div class="result-box"><div class="result-label">Kosten aktuell (inkl. Grundpreis)</div><div class="result-value val-red" id="r_kosten_alt">&#8212;</div></div>
+      <div class="result-box"><div class="result-label">davon Grundpreis / Z&#228;hlergeb&#252;hr</div><div class="result-value val-red" id="r_grundpreis_display">&#8212;</div></div>
+      <div class="result-box"><div class="result-label">Kosten WP (Strom)</div><div class="result-value val-orange" id="r_kosten_neu">&#8212;</div></div>
+      <div class="result-box" style="background:#0a2a1e;border:1px solid var(--green);">
+        <div class="result-label" style="font-weight:700;color:var(--green)">Ersparnis Jahr 1</div>
+        <div class="result-value val-green" id="r_ersparnis">&#8212;</div>
+      </div>
+    </div>
+    <div class="section-header">&#128200; Amortisation</div>
+    <div class="highlight-card">
+      <div><div style="font-size:14px;font-weight:700;">Amortisation</div><div style="font-size:11px;color:var(--text2);margin-top:3px;">Nettoinvestition nach F&#246;rderung</div></div>
+      <div class="amort-value" id="r_amort">&#8212;</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Amortisationszeit</div>
+      <div style="display:flex;gap:14px;margin-bottom:6px;font-size:11px;color:var(--text2);"><span>&#128308; Investitionskapital [k&#8364;]</span><span>&#128994; R&#252;ckfl&#252;sse [k&#8364;]</span></div>
+      <div class="chart-wrap-tall"><canvas id="chart_amort"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">20-Jahres-Projektion</div>
+      <div id="preis_annahmen" class="note" style="margin-bottom:10px;"></div>
+      <div class="result-box"><div class="result-label">Nettoinvestition (nach F&#246;rderung)</div><div class="result-value val-blue" id="r_netto2">&#8212;</div></div>
+      <div class="result-box"><div class="result-label">&#216; Ersparnis / Monat (20J)</div><div class="result-value val-green" id="r_avg_monat">&#8212;</div></div>
+      <div class="result-box"><div class="result-label">&#216; Ersparnis / Jahr (20J)</div><div class="result-value val-green" id="r_avg_jahr">&#8212;</div></div>
+      <div class="result-box"><div class="result-label">Gesamtersparnis brutto (20J)</div><div class="result-value val-green" id="r_gesamt">&#8212;</div></div>
+      <div class="result-box" style="background:#0a2a1e;border:1px solid var(--green);">
+        <div class="result-label" style="font-weight:700;color:var(--green);">&#127381; Nettogewinn nach 20J <span style="font-size:10px;font-weight:400;">(abzgl. Investition)</span></div>
+        <div class="result-value val-green" id="r_nettogewinn">&#8212;</div>
+      </div>
+    </div>
+
+    <div style="margin-top:6px;">
+      <button onclick="drucken()" style="width:100%;padding:14px;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">&#128196;&nbsp; Als PDF speichern / Drucken</button>
+      <p class="note" style="margin-top:6px;text-align:center;">In Safari: Teilen &#8594; Drucken &#8594; Als PDF sichern</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- TAB 3: GERAETE -->
+<div class="tab-panel" id="panel-3">
+  <div class="info-banner">&#128452;&#65039; W&#228;rmepumpen-Modelle hinterlegen &#8211; einmal eingetragen, in jedem Projekt verwendbar.</div>
+  <div id="geraete_liste"></div>
+  <button class="btn-primary" onclick="openGeraetModal()">+ Neues Ger&#228;t hinzuf&#252;gen</button>
+</div>
+
+</div><!-- /content -->
+
+
+<!-- MODAL -->
+<div class="modal-overlay" id="geraet_modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeGeraetModal()">&#10005;</button>
+    <div class="modal-title">Ger&#228;t hinterlegen</div>
+    <div class="upload-zone" onclick="document.getElementById('pdf_upload').click()">
+      <input type="file" id="pdf_upload" accept=".pdf" onchange="handlePdfUpload(event)">
+      <div style="font-size:28px;margin-bottom:6px;">&#128196;</div>
+      <div style="font-size:14px;font-weight:600;margin-bottom:4px;">Datenblatt hochladen (PDF)</div>
+      <div style="font-size:12px;color:var(--text2);">KI liest COP-Werte automatisch aus</div>
+    </div>
+    <div id="pdf_status" class="hidden note" style="margin-bottom:12px;text-align:center;padding:8px;"></div>
+    <div style="text-align:center;color:var(--text2);font-size:12px;margin:8px 0;">&#8212; oder manuell eingeben &#8212;</div>
+    <div class="field"><div class="field-label">Hersteller</div><input class="field-input wide" type="text" id="m_hersteller" placeholder="z.B. Vaillant"></div>
+    <div class="field"><div class="field-label">Modell</div><input class="field-input wide" type="text" id="m_modell" placeholder="z.B. aroTHERM plus 8kW"></div>
+    <div class="field"><div class="field-label">Nennleistung <span class="field-unit">[kW]</span></div><input class="field-input" type="number" id="m_leistung" placeholder="8.0" step="0.5"></div>
+    <table class="cop-table" style="margin:12px 0;">
+      <tr><th>Betriebspunkt</th><th>Au&#223;en</th><th>Vorlauf</th><th>COP</th></tr>
+      <tr><td>A-7/W35</td><td>&#8722;7&#176;C</td><td>35&#176;C</td><td><input type="number" id="m_cop_am7" placeholder="2.5" step="0.1"></td></tr>
+      <tr><td>A2/W35</td><td>+2&#176;C</td><td>35&#176;C</td><td><input type="number" id="m_cop_a2" placeholder="3.5" step="0.1"></td></tr>
+      <tr><td>A7/W35</td><td>+7&#176;C</td><td>35&#176;C</td><td><input type="number" id="m_cop_a7" placeholder="4.2" step="0.1"></td></tr>
+    </table>
+    <button class="btn-primary" onclick="saveGeraet()">&#128190; Ger&#228;t speichern</button>
+  </div>
+</div>
+
+<script>
+var state = { energie:'gas', innensystem:'kombi', selectedGeraetId:null, szenario:'real' };
+var SZENARIO_FAKTOR = { real:1.0, kons:1.15, worst:1.25 };
+var SZENARIO_TEXT = {
+  real:  '&#127919; Realistisch – Standardberechnung nach Faustformel',
+  kons:  '&#128737;&#65039; Konservativ (+15%) – kalte Winter, höherer Warmwasserverbrauch',
+  worst: '&#9888;&#65039; Worst Case (+25%) – für kritische Kunden und harte Bedingungen'
+};
+
+function setSzenario(s) {
+  state.szenario = s;
+  ['real','kons','worst'].forEach(function(x){
+    document.getElementById('sz_'+x).classList.toggle('active', x===s);
+  });
+  document.getElementById('szenario_hinweis').innerHTML = SZENARIO_TEXT[s];
+  berechnen();
+}
+var HERSTELLER_ORDER = ['Vaillant','Panasonic'];
+var HERSTELLER_COLOR = {'Vaillant':'#00b4b4','Panasonic':'#ff8c00'};
+var geraete = [];
+var charts = {};
+var HEIZ_PROFIL = [0.175,0.155,0.120,0.075,0.030,0.005,0.002,0.003,0.020,0.060,0.130,0.165];
+var PV_PROFIL   = [0.030,0.050,0.085,0.105,0.130,0.140,0.145,0.130,0.095,0.060,0.020,0.010];
+var MONATE = ['Jan','Feb','M\u00e4r','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+var VORLAUF_FAKTOR = {35:1.00,45:0.90,55:0.78,65:0.67,70:0.60,75:0.53};
+var COP_GEWICHT = {am7:0.10,a2:0.35,a7:0.55};
+
+loadGeraete(); renderGeraeteListe(); togglePV(); updateVorlaufHinweis();
+
+function switchTab(i){
+  document.querySelectorAll('.tab').forEach(function(t,j){t.classList.toggle('active',i===j);});
+  document.querySelectorAll('.tab-panel').forEach(function(p,j){p.classList.toggle('active',i===j);});
+  if(i===2) berechnen();
+}
+function setEnergie(typ){
+  state.energie=typ;
+  ['gas','oel','strom'].forEach(function(t){document.getElementById('btn_'+t).classList.toggle('active',t===typ);});
+  ['gas','oel','strom'].forEach(function(t){document.getElementById('block_'+t).classList.toggle('hidden',t!==typ);});
+}
+function syncGas(from){
+  if(from==='m3'){var m3=parseFloat(document.getElementById('gas_m3').value)||0;document.getElementById('gas_kwh').value=m3>0?Math.round(m3*10.55):'';}
+  else{var kwh=parseFloat(document.getElementById('gas_kwh').value)||0;document.getElementById('gas_m3').value=kwh>0?Math.round(kwh/10.55):'';}
+}
+function calcOel(){
+  var l=parseFloat(document.getElementById('oel_liter').value)||0;
+  var k=parseFloat(document.getElementById('oel_kosten').value)||0;
+  document.getElementById('oel_preis_display').textContent=l>0&&k>0?(k/l).toFixed(3)+' \u20ac/L':'-- \u20ac/L';
+  document.getElementById('oel_kwh_display').textContent=l>0?Math.round(l*9.8).toLocaleString('de-DE')+' kWh':'-- kWh';
+}
+function setInnensystem(typ){
+  state.innensystem=typ;
+  ['kombi','getrennt'].forEach(function(t){document.getElementById('btn_'+t).classList.toggle('active',t===typ);});
+  document.getElementById('kombi_info').classList.toggle('hidden',typ!=='kombi');
+  document.getElementById('getrennt_info').classList.toggle('hidden',typ!=='getrennt');
+}
+function togglePV(){var on=document.getElementById('pv_aktiv').checked;document.getElementById('pv_section').classList.toggle('hidden',!on);}
+function updateVorlaufHinweis(){var vl=parseInt(document.getElementById('p_vorlauf').value)||55;document.getElementById('vorlauf_hinweis').classList.toggle('hidden',vl<65);}
+function updateCopPreview(){var c=calcJahresCop();document.getElementById('cop_jahres_preview').textContent=c?c.toFixed(2):'--';}
+function calcJahresCop(){
+  var vl=parseInt(document.getElementById('p_vorlauf').value)||55;
+  var f=VORLAUF_FAKTOR[vl]||0.78;
+  var am7=parseFloat(document.getElementById('cop_am7').value)||0;
+  var a2=parseFloat(document.getElementById('cop_a2').value)||0;
+  var a7=parseFloat(document.getElementById('cop_a7').value)||0;
+  if(!am7&&!a2&&!a7) return null;
+  var base=(am7*COP_GEWICHT.am7)+(a2*COP_GEWICHT.a2)+(a7*COP_GEWICHT.a7);
+  return base*f;
+}
+function getEffCop(){
+  var c=calcJahresCop();
+  if(c) return c;
+  var vl=parseInt(document.getElementById('p_vorlauf').value)||55;
+  return 3.8*(VORLAUF_FAKTOR[vl]||0.78);
+}
+function updateNetto(){
+  var inv=parseFloat(document.getElementById('wp_invest').value)||0;
+  var f=parseFloat(document.getElementById('wp_foerderung').value)||0;
+  document.getElementById('netto_invest').textContent=inv>0?fmtEur(inv-f):'--';
+}
+function berechnen(){
+  var heizlast=parseFloat(document.getElementById('p_heizlast').value)||0;
+  var personen=parseInt(document.getElementById('p_personen').value)||3;
+  var vl=parseInt(document.getElementById('p_vorlauf').value)||55;
+  var strompreis=parseFloat(document.getElementById('p_strompreis').value)||0;
+  var stromDelta=parseFloat(document.getElementById('p_strom_delta').value)||0;
+  var gasDelta=parseFloat(document.getElementById('gas_delta').value)||6;
+  var oelDelta=parseFloat(document.getElementById('oel_delta').value)||7;
+  var grundpreis=parseFloat(document.getElementById('grundpreis').value)||0;
+  var invest=parseFloat(document.getElementById('wp_invest').value)||0;
+  var foerd=parseFloat(document.getElementById('wp_foerderung').value)||0;
+  var laufend=parseFloat(document.getElementById('wp_laufend').value)||0;
+  var pvAktiv=document.getElementById('pv_aktiv').checked;
+  var pvErtrag=parseFloat(document.getElementById('pv_ertrag').value)||0;
+
+  var korrfaktor=parseFloat(document.getElementById('korrfaktor').value)||0.8;
+  var verbrauchKwh=0,kostenAlt=0,altDelta=0;
+  if(state.energie==='gas'){
+    verbrauchKwh=parseFloat(document.getElementById('gas_kwh').value)||0;
+    kostenAlt=verbrauchKwh*(parseFloat(document.getElementById('gas_preis').value)||0);
+    altDelta=gasDelta;
+  } else if(state.energie==='oel'){
+    verbrauchKwh=(parseFloat(document.getElementById('oel_liter').value)||0)*9.8;
+    kostenAlt=parseFloat(document.getElementById('oel_kosten').value)||0;
+    altDelta=oelDelta;
+  } else {
+    verbrauchKwh=parseFloat(document.getElementById('strom_kwh').value)||0;
+    kostenAlt=verbrauchKwh*(parseFloat(document.getElementById('strom_preis_alt').value)||0);
+    altDelta=3;
+  }
+  // Grundpreis/Zählergebühr zur Ersparnis hinzurechnen
+  kostenAlt += grundpreis;
+  var ok=strompreis>0&&(heizlast>0||verbrauchKwh>0);
+  document.getElementById('auswertung_placeholder').classList.toggle('hidden',ok);
+  document.getElementById('auswertung_content').classList.toggle('hidden',!ok);
+  if(!ok) return;
+  var cop=getEffCop();
+  var twwKwh=personen*210;
+  var nutzwaerme=0;
+  if(verbrauchKwh>0){
+    // Deine Faustformel: Verbrauch × Korrekturfaktor = Nutzwärme
+    nutzwaerme=verbrauchKwh*korrfaktor;
+  } else if(heizlast>0){
+    // Fallback wenn nur Heizlast bekannt
+    nutzwaerme=heizlast*1950*0.8;
+  }
+  var heizungKwh=Math.max(0,nutzwaerme-twwKwh);
+  var waerme=heizungKwh+twwKwh;
+  // WP-Stromverbrauch: Nutzwärme ÷ COP × Szenario-Faktor
+  var szFaktor = SZENARIO_FAKTOR[state.szenario]||1.0;
+  var wpStrom=(waerme/cop)*szFaktor;
+  var wpMonat=HEIZ_PROFIL.map(function(f,i){return((heizungKwh*f)+twwKwh/12)/cop;});
+  var netto=invest-foerd;
+  var kostenNeu=wpStrom*strompreis+laufend;
+  var ersparnis1=kostenAlt-kostenNeu;
+  var pvDirekt=0,pvRest=0,pvMonatArr=[],wpNetz=[];
+  if(pvAktiv&&pvErtrag>0){
+    pvMonatArr=PV_PROFIL.map(function(f){return pvErtrag*f;});
+    pvMonatArr.forEach(function(pv,i){var d=Math.min(pv,wpMonat[i]);pvDirekt+=d;pvRest+=pv-d;wpNetz.push(wpMonat[i]-d);});
+  } else {wpNetz=wpMonat.slice();}
+  var deckung=pvAktiv&&wpStrom>0?Math.round(pvDirekt/wpStrom*100):0;
+  var amortJahre=calcAmort(netto,ersparnis1,stromDelta,altDelta,laufend,wpStrom,strompreis,kostenAlt);
+  var total20=0;
+  for(var y=0;y<20;y++){
+    var spY=strompreis*Math.pow(1+stromDelta/100,y);
+    var altY=kostenAlt>0?kostenAlt*Math.pow(1+altDelta/100,y):0;
+    total20+=altY-(wpStrom*spY+laufend);
+  }
+  var warnEl=document.getElementById('vorlauf_warn_auswertung');
+  if(vl>=65){warnEl.classList.remove('hidden');warnEl.textContent='\u26a0\ufe0f Vorlauf '+vl+'\u00b0C: COP auf '+cop.toFixed(2)+' reduziert (Faktor '+VORLAUF_FAKTOR[vl]+'). Bei 35\u00b0C w\u00e4re der COP ca. '+(cop/VORLAUF_FAKTOR[vl]).toFixed(2)+' \u2013 erhebliches Einsparpotenzial.';}
+  else{warnEl.classList.add('hidden');}
+  document.getElementById('r_waerme').textContent=fmtKwh(waerme);
+  document.getElementById('r_heizung_kwh').textContent=fmtKwh(heizungKwh);
+  document.getElementById('r_tww_kwh').textContent=fmtKwh(twwKwh);
+  document.getElementById('r_wp_strom').textContent=Math.round(wpStrom).toLocaleString('de-DE');
+  document.getElementById('r_cop_jahres').textContent=cop.toFixed(2);
+  var mAlt=kostenAlt>0?Math.round(kostenAlt/12):null;
+  var mNeu=Math.round(kostenNeu/12);
+  var mDiff=mAlt!==null?mAlt-mNeu:null;
+  document.getElementById('r_monat_alt').textContent=mAlt?mAlt+'\u20ac':'--';
+  document.getElementById('r_monat_neu').textContent=mNeu+'\u20ac';
+  document.getElementById('r_monat_diff').textContent=mDiff!==null?mDiff+'\u20ac':'--';
+  document.getElementById('r_monat_diff').style.color=mDiff>=0?'var(--green)':'var(--red)';
+  document.getElementById('r_kosten_alt').textContent=kostenAlt>0?fmtEur(kostenAlt):'--';
+  document.getElementById('r_grundpreis_display').textContent=grundpreis>0?fmtEur(grundpreis):'--';
+  document.getElementById('r_kosten_neu').textContent=fmtEur(kostenNeu);
+  document.getElementById('r_ersparnis').textContent=fmtEur(ersparnis1);
+  document.getElementById('r_ersparnis').className='result-value '+(ersparnis1>=0?'val-green':'val-red');
+  var nettogewinn20 = total20 - netto;
+  document.getElementById('r_netto2').textContent=netto>0?fmtEur(netto):'--';
+  document.getElementById('r_avg_monat').textContent=fmtEur(total20/20/12);
+  document.getElementById('r_avg_jahr').textContent=fmtEur(total20/20);
+  document.getElementById('r_gesamt').textContent=fmtEur(total20);
+  document.getElementById('r_nettogewinn').textContent=fmtEur(nettogewinn20);
+  document.getElementById('r_nettogewinn').className='result-value '+(nettogewinn20>=0?'val-green':'val-red');
+  var energieLabel=state.energie==='gas'?'Gas':state.energie==='oel'?'Öl':'Strom';
+  document.getElementById('preis_annahmen').textContent='Annahmen: '+energieLabel+'-Preis +'+altDelta+'%/Jahr · Strom +'+(stromDelta||0)+'%/Jahr (CO\u2082-Steuer ETS 2 ab 2028 eingerechnet)';
+  document.getElementById('netto_invest').textContent=netto>0?fmtEur(netto):'--';
+  if(amortJahre!==null){var j=Math.floor(amortJahre),m=Math.round((amortJahre%1)*12);document.getElementById('r_amort').textContent=j+' J '+m+' M';}
+  else{document.getElementById('r_amort').textContent=netto<=0?'sofort':'> 25 J';}
+  document.getElementById('pv_auswertung').classList.toggle('hidden',!pvAktiv);
+  if(pvAktiv){
+    document.getElementById('donut_pct').textContent=deckung+'%';
+    document.getElementById('leg_direkt').textContent=fmtKwh(pvDirekt)+' direkte PV-Nutzung (WP)';
+    document.getElementById('leg_netz').textContent=fmtKwh(wpStrom-pvDirekt)+' Netzbezug (WP)';
+    document.getElementById('leg_rest').textContent=fmtKwh(pvRest)+' PV-Einspeisung (Rest)';
+  }
+  renderVerbrauch(wpMonat);
+  if(pvAktiv){renderDonut(pvDirekt,wpStrom-pvDirekt,pvRest);renderPvWp(pvMonatArr,wpMonat);}
+  renderAmort(netto,ersparnis1,stromDelta,altDelta,laufend,wpStrom,strompreis,kostenAlt);
+}
+function calcAmort(netto,ers1,stromDelta,altDelta,laufend,wpStrom,strompreis,kostenAlt){
+  if(netto<=0) return 0;
+  if(ers1<=0) return null;
+  var kum=0;
+  for(var y=0;y<25;y++){
+    var spY=strompreis*Math.pow(1+stromDelta/100,y);
+    var altY=kostenAlt>0?kostenAlt*Math.pow(1+altDelta/100,y):0;
+    var erspY=altY-(wpStrom*spY+laufend);
+    kum+=erspY;
+    if(kum>=netto){return y+1-(kum-netto)/Math.max(erspY,1);}
+  }
+  return null;
+}
+function dc(id){if(charts[id]){charts[id].destroy();delete charts[id];}}
+function renderVerbrauch(data){
+  dc('v');var ctx=document.getElementById('chart_verbrauch').getContext('2d');
+  charts.v=new Chart(ctx,{type:'bar',data:{labels:MONATE,datasets:[{data:data.map(function(v){return Math.round(v);}),backgroundColor:data.map(function(v){return v>500?'#ff5c5c':v>300?'#ffb347':'#4a9eff';}),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.parsed.y+' kWh';}}}},scales:{x:{grid:{color:'#2a3050'},ticks:{color:'#8b91a8',font:{size:11}}},y:{grid:{color:'#2a3050'},ticks:{color:'#8b91a8',font:{size:11}}}}}});
+}
+function renderDonut(d,n,r){
+  dc('dn');var ctx=document.getElementById('chart_donut').getContext('2d');
+  charts.dn=new Chart(ctx,{type:'doughnut',data:{datasets:[{data:[d,n,r],backgroundColor:['#ffd600','#ff5c5c','#3ecf8e'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return Math.round(c.parsed)+' kWh';}}}}}});
+}
+function renderPvWp(pv,wp){
+  dc('pw');var ctx=document.getElementById('chart_pv_wp').getContext('2d');
+  charts.pw=new Chart(ctx,{type:'bar',data:{labels:MONATE,datasets:[{label:'PV-Ertrag',data:pv.map(function(v){return Math.round(v);}),backgroundColor:'#ffd600aa',borderRadius:3},{label:'WP-Bedarf',data:wp.map(function(v){return -Math.round(v);}),backgroundColor:'#4a9effaa',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#8b91a8',font:{size:11},boxWidth:10}},tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+Math.abs(c.parsed.y)+' kWh';}}}},scales:{x:{grid:{color:'#2a3050'},ticks:{color:'#8b91a8',font:{size:11}}},y:{grid:{color:'#2a3050'},ticks:{color:'#8b91a8',font:{size:11},callback:function(v){return Math.abs(v);}}}}}});
+}
+function renderAmort(netto,ers1,stromDelta,altDelta,laufend,wpStrom,strompreis,kostenAlt){
+  dc('am');var ctx=document.getElementById('chart_amort').getContext('2d');
+  var jahre=Array.from({length:21},function(_,i){return i;});
+  var inv=jahre.map(function(){return+(netto/1000).toFixed(2);});
+  var kum=0;
+  var rueck=jahre.map(function(y){
+    if(y===0)return 0;
+    var spY=strompreis*Math.pow(1+stromDelta/100,y-1);
+    var altY=kostenAlt>0?kostenAlt*Math.pow(1+(altDelta||6)/100,y-1):0;
+    kum+=altY-(wpStrom*spY+(laufend||0));
+    return+(kum/1000).toFixed(2);
+  });
+  charts.am=new Chart(ctx,{type:'line',data:{labels:jahre.map(function(y){return 'J'+y;}),datasets:[{label:'Investition',data:inv,borderColor:'#ff5c5c',backgroundColor:'transparent',borderWidth:2,pointRadius:0,borderDash:[5,3]},{label:'Zahlungsr\u00fcckfl\u00fcsse',data:rueck,borderColor:'#3ecf8e',backgroundColor:'rgba(62,207,142,0.08)',fill:true,borderWidth:2.5,pointRadius:0,tension:0.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#8b91a8',font:{size:11},boxWidth:10}},tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+c.parsed.y.toFixed(1)+' k\u20ac';}}}},scales:{x:{grid:{color:'#2a3050'},ticks:{color:'#8b91a8',font:{size:10},maxTicksLimit:11}},y:{grid:{color:'#2a3050'},ticks:{color:'#8b91a8',font:{size:11},callback:function(v){return v+' k\u20ac';}}}}}}); 
+}
+function loadGeraete(){
+  // Hardcoded Gerätedatenbank – sortiert nach Vaillant, Panasonic
+  var DB = [
+    // ===== VAILLANT =====
+    // aroTHERM plus /8.1 (aktuelle Serie)
+    {id:'va_35_81', h:'Vaillant', m:'aroTHERM plus VWL 35',  v:'/8.1 · 230V',  l:3.5,  am7:3.04, a2:4.07, a7:4.92},
+    {id:'va_55_81', h:'Vaillant', m:'aroTHERM plus VWL 55',  v:'/8.1 · 230V',  l:5.5,  am7:2.67, a2:4.07, a7:4.92},
+    {id:'va_75_81', h:'Vaillant', m:'aroTHERM plus VWL 75',  v:'/8.1 · 230V',  l:7.5,  am7:2.94, a2:4.10, a7:4.94},
+    {id:'va_105_81',h:'Vaillant', m:'aroTHERM plus VWL 105', v:'/8.1 · 400V',  l:10.5, am7:3.01, a2:4.40, a7:5.29},
+    {id:'va_125_81',h:'Vaillant', m:'aroTHERM plus VWL 125', v:'/8.1 · 400V',  l:12.5, am7:2.72, a2:4.40, a7:5.39},
+    // aroTHERM plus /6 (Legacy / Bestandsanlagen)
+    {id:'va_35_6',  h:'Vaillant', m:'aroTHERM plus VWL 35',  v:'/6 · Legacy',  l:3.5,  am7:2.70, a2:3.90, a7:4.80},
+    {id:'va_55_6',  h:'Vaillant', m:'aroTHERM plus VWL 55',  v:'/6 · Legacy',  l:5.5,  am7:2.60, a2:3.90, a7:4.80},
+    {id:'va_75_6',  h:'Vaillant', m:'aroTHERM plus VWL 75',  v:'/6 · Legacy',  l:7.5,  am7:2.80, a2:4.10, a7:4.80},
+    {id:'va_105_6', h:'Vaillant', m:'aroTHERM plus VWL 105', v:'/6 · Legacy',  l:10.5, am7:2.70, a2:4.60, a7:5.30},
+    {id:'va_125_6', h:'Vaillant', m:'aroTHERM plus VWL 125', v:'/6 · Legacy',  l:12.5, am7:2.70, a2:4.60, a7:5.40},
+    // ===== PANASONIC =====
+    {id:'pa_9_1',   h:'Panasonic', m:'Aquarea T-CAP 9kW',    v:'M-Serie · 230V',  l:9.0,  am7:3.45, a2:3.81, a7:5.23},
+    {id:'pa_9_3',   h:'Panasonic', m:'Aquarea T-CAP 9kW',    v:'M-Serie · 400V',  l:9.0,  am7:3.45, a2:3.81, a7:5.23},
+    {id:'pa_12',    h:'Panasonic', m:'Aquarea T-CAP 12kW',   v:'M-Serie · 400V',  l:12.0, am7:3.00, a2:3.54, a7:5.06},
+    {id:'pa_16',    h:'Panasonic', m:'Aquarea T-CAP 16kW',   v:'M-Serie · 400V',  l:16.0, am7:2.53, a2:3.30, a7:4.89},
+    {id:'pa_20',    h:'Panasonic', m:'Big Aquarea T-CAP 20kW',v:'M-Serie · 400V', l:20.0, am7:2.48, a2:3.39, a7:4.80},
+    {id:'pa_25',    h:'Panasonic', m:'Big Aquarea T-CAP 25kW',v:'M-Serie · 400V', l:25.0, am7:2.36, a2:2.80, a7:4.50},
+    {id:'pa_30',    h:'Panasonic', m:'Big Aquarea T-CAP 30kW',v:'M-Serie · 400V', l:30.0, am7:2.33, a2:2.50, a7:4.40},
+  ];
+    // Nur laden wenn noch keine benutzerdefinierten Geräte da sind
+  var stored = [];
+  try { stored = JSON.parse(localStorage.getItem('wp_geraete_custom')||'[]'); } catch(e){}
+  geraete = DB.concat(stored);
+}
+
+function saveGeraeteLS(){
+  // Nur benutzerdefinierte Geräte speichern (nicht die DB)
+  var custom = geraete.filter(function(g){return g.custom;});
+  try{localStorage.setItem('wp_geraete_custom',JSON.stringify(custom));}catch(e){}
+}
+
+
+function renderGeraeteListe(){
+  var el=document.getElementById('geraete_liste');
+  var html='';
+  HERSTELLER_ORDER.forEach(function(h){
+    var gruppe=geraete.filter(function(g){return g.h===h;});
+    if(gruppe.length===0) return;
+    var col=HERSTELLER_COLOR[h]||'#8b91a8';
+    html+='<div style="display:flex;align-items:center;gap:10px;margin:16px 0 8px;">'+
+      '<div style="height:2px;flex:1;background:'+col+';opacity:0.4;"></div>'+
+      '<div style="font-size:13px;font-weight:800;color:'+col+';letter-spacing:1px;text-transform:uppercase;">'+h+'</div>'+
+      '<div style="height:2px;flex:1;background:'+col+';opacity:0.4;"></div>'+
+      '</div>';
+    gruppe.forEach(function(g){
+      var sel=state.selectedGeraetId===g.id;
+      html+='<div class="geraet-card'+(sel?' selected':'')+'" onclick="selectGeraet(\''+g.id+'\')">'+
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'+
+        '<div style="flex:1;">'+
+        '<div style="display:flex;align-items:center;gap:8px;">'+
+        '<div style="width:3px;height:32px;background:'+col+';border-radius:2px;flex-shrink:0;"></div>'+
+        '<div>'+
+        '<div class="geraet-name">'+g.m+'</div>'+
+        '<div class="geraet-sub">'+g.l+' kW &nbsp;·&nbsp; '+g.v+'</div>'+
+        '</div></div>'+
+        '<div class="geraet-cop" style="margin-left:11px;">'+
+        '<span class="cop-badge">A&#8722;7: '+g.am7+'</span>'+
+        '<span class="cop-badge">A2: '+g.a2+'</span>'+
+        '<span class="cop-badge">A7: '+g.a7+'</span>'+
+        '</div></div>'+
+        (g.custom?'<button class="btn-danger" onclick="event.stopPropagation();deleteGeraet(\''+g.id+'\')">&#10005;</button>':'')+
+        '</div></div>';
+    });
+  });
+  // Benutzerdefinierte Geräte (andere Hersteller)
+  var custom=geraete.filter(function(g){return g.custom && HERSTELLER_ORDER.indexOf(g.h)===-1;});
+  if(custom.length>0){
+    html+='<div style="display:flex;align-items:center;gap:10px;margin:16px 0 8px;">'+
+      '<div style="height:2px;flex:1;background:#8b91a8;opacity:0.4;"></div>'+
+      '<div style="font-size:13px;font-weight:800;color:#8b91a8;letter-spacing:1px;">WEITERE</div>'+
+      '<div style="height:2px;flex:1;background:#8b91a8;opacity:0.4;"></div></div>';
+    custom.forEach(function(g){
+      html+='<div class="geraet-card'+(state.selectedGeraetId===g.id?' selected':'')+'" onclick="selectGeraet(\''+g.id+'\')">'+
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'+
+        '<div><div class="geraet-name">'+g.h+' – '+g.m+'</div>'+
+        '<div class="geraet-sub">'+g.l+' kW</div>'+
+        '<div class="geraet-cop"><span class="cop-badge">A&#8722;7: '+g.am7+'</span><span class="cop-badge">A2: '+g.a2+'</span><span class="cop-badge">A7: '+g.a7+'</span></div></div>'+
+        '<button class="btn-danger" onclick="event.stopPropagation();deleteGeraet(\''+g.id+'\')">&#10005;</button>'+
+        '</div></div>';
+    });
+  }
+  el.innerHTML=html||'<div class="note" style="text-align:center;padding:20px 0;">Keine Ger\u00e4te gefunden.</div>';
+}
+function selectGeraet(id){
+  var g=geraete.find(function(x){return x.id===id;});
+  if(!g) return;
+  state.selectedGeraetId=id;
+  document.getElementById('cop_am7').value=g.am7;
+  document.getElementById('cop_a2').value=g.a2;
+  document.getElementById('cop_a7').value=g.a7;
+  document.getElementById('wp_leistung').value=g.l;
+  updateCopPreview();
+  var col=HERSTELLER_COLOR[g.h]||'#8b91a8';
+  var info=document.getElementById('wp_geraet_info');
+  info.style.background='rgba(0,0,0,0.2)';
+  info.style.borderColor=col;
+  info.style.color=col;
+  info.textContent='\u2705 '+g.h+' \u2013 '+g.m+' ('+g.l+' kW)';
+  info.classList.remove('hidden');
+  renderGeraeteListe();
+  switchTab(1);
+}
+function deleteGeraet(id){
+  var g=geraete.find(function(x){return x.id===id;});
+  if(!g||!g.custom){alert('Standard-Geräte können nicht gelöscht werden.');return;}
+  if(!confirm('Gerät löschen?')) return;
+  geraete=geraete.filter(function(x){return x.id!==id;});
+  saveGeraeteLS();renderGeraeteListe();
+}
+function openGeraetModal(){
+  ['m_hersteller','m_modell','m_leistung','m_cop_am7','m_cop_a2','m_cop_a7'].forEach(function(id){document.getElementById(id).value='';});
+  var s=document.getElementById('pdf_status');s.classList.add('hidden');s.style.color='';
+  document.getElementById('geraet_modal').classList.add('open');
+}
+function closeGeraetModal(){document.getElementById('geraet_modal').classList.remove('open');}
+function saveGeraet(){
+  var h=document.getElementById('m_hersteller').value.trim();
+  var m=document.getElementById('m_modell').value.trim();
+  var l=parseFloat(document.getElementById('m_leistung').value)||0;
+  var am7=parseFloat(document.getElementById('m_cop_am7').value)||0;
+  var a2=parseFloat(document.getElementById('m_cop_a2').value)||0;
+  var a7=parseFloat(document.getElementById('m_cop_a7').value)||0;
+  if(!h||!m||!l||!a7){alert('Bitte mindestens Hersteller, Modell, Leistung und COP A7/W35 eingeben.');return;}
+  var g={id:'g_'+Date.now(),h:h,m:m,v:'',l:l,am7:am7||0,a2:a2||0,a7:a7,custom:true};
+  geraete.push(g);saveGeraeteLS();renderGeraeteListe();closeGeraetModal();
+}
+async function handlePdfUpload(event){
+  var file=event.target.files[0];if(!file) return;
+  var s=document.getElementById('pdf_status');
+  s.classList.remove('hidden');s.style.color='var(--text2)';
+  s.innerHTML='<span class="spinner"></span>Datenblatt wird analysiert\u2026';
+  try{
+    var base64=await fileToBase64(file);
+    var resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:[{type:'document',source:{type:'base64',media_type:'application/pdf',data:base64}},{type:'text',text:'Analysiere dieses W\u00e4rmepumpen-Datenblatt. Antworte NUR mit einem JSON-Objekt, kein anderer Text:\n{"hersteller":"Name","modell":"Modell inkl. Leistungsklasse","leistung_kw":8.0,"cop_am7_w35":2.5,"cop_a2_w35":3.5,"cop_a7_w35":4.2}\nFalls ein Wert nicht gefunden: null. COP-Werte nach EN 14511.'}]}]})});
+    var data=await resp.json();
+    var txt=((data.content||[]).find(function(c){return c.type==='text';})||{}).text||'';
+    var parsed=JSON.parse(txt.replace(/```json|```/g,'').trim());
+    if(parsed.hersteller) document.getElementById('m_hersteller').value=parsed.hersteller;
+    if(parsed.modell) document.getElementById('m_modell').value=parsed.modell;
+    if(parsed.leistung_kw) document.getElementById('m_leistung').value=parsed.leistung_kw;
+    if(parsed.cop_am7_w35) document.getElementById('m_cop_am7').value=parsed.cop_am7_w35;
+    if(parsed.cop_a2_w35) document.getElementById('m_cop_a2').value=parsed.cop_a2_w35;
+    if(parsed.cop_a7_w35) document.getElementById('m_cop_a7').value=parsed.cop_a7_w35;
+    s.style.color='var(--green)';s.innerHTML='\u2705 Werte ausgelesen \u2013 bitte pr\u00fcfen und ggf. korrigieren.';
+  }catch(e){s.style.color='var(--red)';s.innerHTML='\u274c Auslesen fehlgeschlagen \u2013 bitte manuell eingeben.';}
+}
+function fileToBase64(file){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){res(r.result.split(',')[1]);};r.onerror=function(){rej(new Error('Lesefehler'));};r.readAsDataURL(file);});}
+function fmtKwh(v){return Math.round(v).toLocaleString('de-DE')+' kWh';}
+function fmtEur(v){return Math.round(v).toLocaleString('de-DE')+' \u20ac';}
+function resetAll(){
+  if(!confirm('Alle Eingaben zur\u00fccksetzen?')) return;
+  document.querySelectorAll('input[type=number],input[type=text]').forEach(function(el){el.value='';});
+  document.querySelectorAll('input[type=checkbox]').forEach(function(el){el.checked=false;});
+  state.selectedGeraetId=null;setEnergie('gas');setInnensystem('kombi');togglePV();
+  document.getElementById('auswertung_content').classList.add('hidden');
+  document.getElementById('auswertung_placeholder').classList.remove('hidden');
+  document.getElementById('wp_geraet_info').classList.add('hidden');
+}
+function drucken() {
+  var kunde = document.getElementById('p_name').value || 'Kunde';
+  var adresse = document.getElementById('p_adresse').value || '';
+  var datum = new Date().toLocaleDateString('de-DE');
+  var sz = state.szenario === 'real' ? 'Realistisch' : state.szenario === 'kons' ? 'Konservativ (+15%)' : 'Worst Case (+25%)';
+
+  // Alle relevanten Werte sammeln
+  function v(id) { var el=document.getElementById(id); return el ? el.textContent : '--'; }
+
+  var printHTML = '<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8">' +
+    '<title>WP Rechner – ' + kunde + '</title>' +
+    '<style>' +
+    'body{font-family:-apple-system,sans-serif;font-size:13px;color:#111;max-width:700px;margin:0 auto;padding:24px;}' +
+    'h1{font-size:20px;margin-bottom:4px;}' +
+    'h2{font-size:14px;margin:18px 0 8px;padding-bottom:4px;border-bottom:2px solid #333;}' +
+    '.row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee;}' +
+    '.label{color:#555;}' +
+    '.val{font-weight:700;}' +
+    '.val-orange{color:#d97706;}' +
+    '.val-green{color:#059669;}' +
+    '.val-red{color:#dc2626;}' +
+    '.val-blue{color:#2563eb;}' +
+    '.disclaimer{margin-top:30px;padding:12px;background:#f9f9f9;border:1px solid #ddd;border-radius:6px;font-size:11px;color:#666;line-height:1.6;}' +
+    '.header{display:flex;justify-content:space-between;margin-bottom:20px;padding-bottom:12px;border-bottom:3px solid #111;}' +
+    '.szenario-badge{display:inline-block;padding:3px 10px;border-radius:4px;background:#f0f0f0;font-size:11px;font-weight:600;}' +
+    '@media print{body{padding:12px;}}' +
+    '</style></head><body>' +
+    '<div class="header">' +
+    '<div><h1>&#9889; WP Rechner – Auswertung</h1>' +
+    '<div>' + kunde + (adresse ? ' &nbsp;·&nbsp; ' + adresse : '') + '</div></div>' +
+    '<div style="text-align:right;"><div>' + datum + '</div>' +
+    '<div class="szenario-badge">' + sz + '</div></div>' +
+    '</div>' +
+
+    '<h2>&#127777;&#65039; Wärmebilanz</h2>' +
+    '<div class="row"><span class="label">Wärmebedarf gesamt (thermisch)</span><span class="val val-blue">' + v('r_waerme') + '</span></div>' +
+    '<div class="row"><span class="label">davon Heizung</span><span class="val val-orange">' + v('r_heizung_kwh') + '</span></div>' +
+    '<div class="row"><span class="label">davon Warmwasser</span><span class="val" style="color:#0ea5e9">' + v('r_tww_kwh') + '</span></div>' +
+
+    '<h2>&#9889; Energiebilanz</h2>' +
+    '<div class="row"><span class="label">WP-Stromverbrauch / Jahr</span><span class="val val-orange">' + v('r_wp_strom') + ' kWh</span></div>' +
+    '<div class="row"><span class="label">Errechneter Jahres-COP</span><span class="val val-green">' + v('r_cop_jahres') + '</span></div>' +
+
+    '<h2>&#128182; Kostenvergleich</h2>' +
+    '<div class="row"><span class="label">Bisherige Energiekosten / Jahr</span><span class="val val-red">' + v('r_kosten_alt') + '</span></div>' +
+    '<div class="row"><span class="label">WP-Stromkosten / Jahr</span><span class="val val-orange">' + v('r_kosten_neu') + '</span></div>' +
+    '<div class="row"><span class="label">Ersparnis Jahr 1</span><span class="val val-green">' + v('r_ersparnis') + '</span></div>' +
+    '<div class="row"><span class="label">&#216; Ersparnis / Monat</span><span class="val val-green">' + v('r_monat_diff') + '</span></div>' +
+
+    '<h2>&#128200; Amortisation & 20-Jahres-Projektion</h2>' +
+    '<div class="row"><span class="label">Nettoinvestition (nach Förderung)</span><span class="val val-blue">' + v('r_netto2') + '</span></div>' +
+    '<div class="row"><span class="label">Amortisation</span><span class="val" style="color:#d97706">' + v('r_amort') + '</span></div>' +
+    '<div class="row"><span class="label">&#216; Ersparnis / Monat (20J)</span><span class="val val-green">' + v('r_avg_monat') + '</span></div>' +
+    '<div class="row"><span class="label">&#216; Ersparnis / Jahr (20J)</span><span class="val val-green">' + v('r_avg_jahr') + '</span></div>' +
+    '<div class="row"><span class="label">Gesamtersparnis brutto (20J)</span><span class="val val-green">' + v('r_gesamt') + '</span></div>' +
+    '<div class="row" style="background:#f0fdf4;"><span class="label" style="font-weight:700;">Nettogewinn nach 20J (abzgl. Investition)</span><span class="val val-green">' + v('r_nettogewinn') + '</span></div>' +
+
+    '<div class="disclaimer">' +
+    '<strong>Hinweis:</strong> Alle Angaben basieren auf Durchschnittswerten und dienen ausschließlich der Erstorientierung. ' +
+    'Tatsächlicher Energieverbrauch und Einsparungen können je nach Witterungsverhältnissen, individuellem Heizverhalten, ' +
+    'Warmwasserverbrauch sowie dem energetischen Zustand des Gebäudes erheblich abweichen. ' +
+    'Es handelt sich um keine Garantie oder Gewährleistung. Eine verbindliche Berechnung erfolgt im Rahmen der individuellen Fachberatung.' +
+    '</div>' +
+    '</body></html>';
+
+  var w = window.open('', '_blank');
+  w.document.write(printHTML);
+  w.document.close();
+  w.focus();
+  setTimeout(function(){ w.print(); }, 400);
+}
+
+function showHelp(){alert('WP Rechner \u2013 Kurzanleitung\n\n1. Projekt: Heizlast (BWP), Verbrauch & Preise\n2. W\u00e4rmepumpe: Ger\u00e4t w\u00e4hlen oder COP manuell, Speicher, Investition\n3. \u25b6 dr\u00fccken \u2192 Auswertung\n4. Ger\u00e4te-Tab: PDF hochladen oder COP-Werte eintragen\n\nCOP-Betriebspunkte (EN 14511):\nA-7/W35 = -7\u00b0C au\u00dfen, 35\u00b0C Vorlauf (Winterbetrieb)\nA2/W35  = +2\u00b0C au\u00dfen (Herbst/Fr\u00fchjahr)\nA7/W35  = +7\u00b0C au\u00dfen (milder Winter)\n\nPWA installieren: In Safari \u2192 Teilen \u2192 \u201eZum Home-Bildschirm\u201c');}
+document.getElementById('geraet_modal').addEventListener('click',function(e){if(e.target===this) closeGeraetModal();});
+</script>
+</body>
+</html>
