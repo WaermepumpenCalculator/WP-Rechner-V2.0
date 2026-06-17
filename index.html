@@ -9,29 +9,29 @@
 <title>WP Rechner 2.0</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-:root{--bg:#0f1117;--bg2:#181c27;--bg3:#1e2336;--border:#2a3050;--text:#e8eaf0;--text2:#8b91a8;--blue:#4a9eff;--green:#3ecf8e;--red:#ff5c5c;--orange:#ffb347;--yellow:#ffd600;--accent:#5b8cff;}
+:root{--bg:#142841;--bg2:#1b3354;--bg3:#234268;--border:#3a5a85;--text:#f4f7fb;--text2:#9fb8d4;--blue:#6ab8ff;--green:#42dba0;--red:#ff7a7a;--orange:#ffb868;--yellow:#ffe066;--accent:#4a9aff;}
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;font-size:15px;overscroll-behavior:none;}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 10px;background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
-.topbar-title{font-size:20px;font-weight:700;}
+html,body{height:100%;background:radial-gradient(ellipse 1200px 600px at 50% -100px,#2a4a72 0%,var(--bg) 55%);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;font-size:15px;overscroll-behavior:none;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 12px;background:rgba(20,40,65,0.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+.topbar-title{font-size:19px;font-weight:700;letter-spacing:-0.2px;color:var(--text);}
 .topbar-icons{display:flex;gap:14px;}
 .topbar-icons button{background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;padding:2px;}
-.tabs{display:flex;background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:57px;z-index:99;}
-.tab{flex:1;padding:10px 4px 9px;text-align:center;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;}
-.tab.active{color:var(--blue);border-bottom-color:var(--blue);}
+.tabs{display:flex;background:rgba(20,40,65,0.6);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);position:sticky;top:59px;z-index:99;}
+.tab{flex:1;padding:10px 4px 9px;text-align:center;font-size:11.5px;font-weight:600;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;letter-spacing:0.2px;text-transform:uppercase;}
+.tab.active{color:var(--blue);border-bottom-color:var(--blue);background:rgba(91,168,232,0.06);}
 .tab-icon{font-size:14px;margin-bottom:2px;}
 .content{padding:16px 14px 100px;max-width:520px;margin:0 auto;}
 .tab-panel{display:none;}
 .tab-panel.active{display:block;}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;}
-.card-title{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:14px;letter-spacing:0.6px;text-transform:uppercase;}
+.card{background:linear-gradient(145deg,rgba(255,255,255,0.04) 0%,rgba(255,255,255,0) 100%),var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 4px 16px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.06);}
+.card-title{font-size:11px;font-weight:700;color:var(--text2);margin-bottom:14px;letter-spacing:1px;text-transform:uppercase;padding-bottom:8px;border-bottom:1px solid var(--border);}
 .field{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);gap:10px;}
 .field:last-child{border-bottom:none;padding-bottom:0;}
 .field:first-child{padding-top:0;}
 .field-label{font-size:14px;color:var(--text);flex:1;line-height:1.3;}
 .field-unit{font-size:11px;color:var(--text2);margin-left:3px;white-space:nowrap;}
 .badge{font-size:10px;color:var(--text2);font-weight:400;margin-left:5px;}
-.field-input{background:transparent;border:none;border-bottom:1.5px solid var(--blue);color:var(--text);font-size:15px;font-weight:500;text-align:right;width:90px;padding:2px 4px;outline:none;-webkit-appearance:none;}
+.field-input{background:transparent;border:none;border-bottom:1.5px solid var(--blue);color:var(--text);font-size:14.5px;font-weight:500;text-align:right;width:90px;padding:2px 4px;outline:none;-webkit-appearance:none;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;}
 .field-input.wide{width:130px;}
 .field-select{background:var(--bg3);border:1px solid var(--border);color:var(--text);font-size:13px;padding:5px 8px;border-radius:6px;outline:none;cursor:pointer;max-width:160px;}
 .field-toggle{position:relative;width:44px;height:26px;flex-shrink:0;}
@@ -41,22 +41,22 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .field-toggle input:checked + .toggle-slider{background:var(--blue);}
 .field-toggle input:checked + .toggle-slider::after{transform:translateX(18px);}
 .btn-group{display:flex;gap:6px;}
-.btn-choice{flex:1;padding:7px 4px;border-radius:7px;border:1.5px solid var(--border);background:transparent;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;text-align:center;}
-.btn-choice.active{border-color:var(--blue);color:var(--blue);background:#0d2040;}
-.result-box{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--bg3);border-radius:8px;margin-bottom:7px;}
+.btn-choice{flex:1;padding:8px 4px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;text-align:center;}
+.btn-choice.active{border-color:var(--blue);color:#fff;background:var(--accent);box-shadow:0 2px 6px rgba(61,143,224,0.3);}
+.result-box{display:flex;justify-content:space-between;align-items:center;padding:11px 13px;background:var(--bg3);border-radius:8px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.05);box-shadow:inset 0 1px 0 rgba(255,255,255,0.04);}
 .result-label{font-size:13px;color:var(--text2);}
-.result-value{font-size:15px;font-weight:700;padding:3px 9px;border-radius:5px;min-width:68px;text-align:center;}
+.result-value{font-size:14.5px;font-weight:700;padding:3px 9px;border-radius:5px;min-width:68px;text-align:center;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:-0.2px;}
 .val-blue{background:#0d2040;color:var(--blue);}
 .val-green{background:#0a2a1e;color:var(--green);}
 .val-red{background:#2a0d0d;color:var(--red);}
 .val-orange{background:#2a1a00;color:var(--orange);}
 .val-yellow{background:#2a2000;color:var(--yellow);}
 .monthly-row{display:flex;gap:8px;margin-bottom:14px;}
-.monthly-box{flex:1;background:var(--bg3);border-radius:10px;padding:11px;text-align:center;}
-.monthly-val{font-size:20px;font-weight:800;}
-.monthly-lbl{font-size:10px;color:var(--text2);margin-top:3px;}
-.highlight-card{background:var(--bg3);border-radius:12px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
-.amort-value{font-size:22px;font-weight:800;color:var(--yellow);}
+.monthly-box{flex:1;background:var(--bg3);border-radius:8px;padding:12px 11px 11px;text-align:center;border-top:2px solid var(--blue);box-shadow:0 1px 3px rgba(0,0,0,0.3);}
+.monthly-val{font-size:21px;font-weight:800;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:-0.5px;}
+.monthly-lbl{font-size:9.5px;color:var(--text2);margin-top:3px;text-transform:uppercase;letter-spacing:0.4px;}
+.highlight-card{background:linear-gradient(135deg,var(--bg3) 0%,#1a2d42 100%);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;box-shadow:0 2px 12px rgba(0,0,0,0.3);}
+.amort-value{font-size:22px;font-weight:800;color:var(--yellow);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-shadow:0 0 12px rgba(255,216,77,0.3);}
 .chart-wrap{position:relative;height:190px;margin-top:10px;}
 .chart-wrap-tall{position:relative;height:230px;margin-top:10px;}
 .donut-row{display:flex;align-items:center;gap:14px;margin-bottom:10px;}
@@ -67,19 +67,19 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .donut-legend{flex:1;display:flex;flex-direction:column;gap:6px;}
 .legend-item{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text2);}
 .legend-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
-.section-header{font-size:16px;font-weight:700;margin:18px 0 10px;color:var(--text);}
+.section-header{font-size:15px;font-weight:700;margin:20px 0 11px;color:var(--text);padding-left:10px;border-left:3px solid var(--blue);letter-spacing:0.1px;}
 .section-header:first-child{margin-top:0;}
-.info-banner{background:#0d2040;border:1px solid var(--blue);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12.5px;color:var(--blue);line-height:1.5;}
-.warn-banner{background:#2a1a00;border:1px solid var(--orange);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12.5px;color:var(--orange);line-height:1.5;}
+.info-banner{background:rgba(91,168,232,0.08);border-left:3px solid var(--blue);border-radius:6px;padding:10px 12px;margin-bottom:12px;font-size:12.5px;color:#a8cef0;line-height:1.5;}
+.warn-banner{background:rgba(255,174,92,0.08);border-left:3px solid var(--orange);border-radius:6px;padding:10px 12px;margin-bottom:12px;font-size:12.5px;color:#ffc88a;line-height:1.5;}
 .note{font-size:12px;color:var(--text2);margin-top:6px;line-height:1.5;}
 .fab{position:fixed;bottom:24px;right:20px;width:54px;height:54px;border-radius:27px;background:var(--accent);border:none;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 4px 20px rgba(91,140,255,0.5);z-index:200;display:flex;align-items:center;justify-content:center;}
-.geraet-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;cursor:pointer;}
-.geraet-card.selected{border-color:var(--blue);background:#0d2040;}
+.geraet-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px;cursor:pointer;transition:border-color .15s,background .15s;}
+.geraet-card.selected{border-color:var(--blue);background:rgba(91,168,232,0.1);box-shadow:0 0 0 1px var(--blue);}
 .geraet-name{font-size:14px;font-weight:700;}
 .geraet-sub{font-size:12px;color:var(--text2);margin-top:3px;}
 .geraet-cop{display:flex;gap:7px;margin-top:8px;flex-wrap:wrap;}
 .cop-badge{font-size:11px;padding:2px 7px;border-radius:4px;background:var(--bg2);color:var(--text2);}
-.btn-primary{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:14px;font-weight:600;cursor:pointer;width:100%;margin-top:8px;}
+.btn-primary{background:linear-gradient(135deg,var(--accent) 0%,#2d6cb8 100%);color:#fff;border:none;border-radius:8px;padding:11px 18px;font-size:14px;font-weight:600;cursor:pointer;width:100%;margin-top:8px;letter-spacing:0.2px;box-shadow:0 2px 8px rgba(61,143,224,0.3);}
 .btn-danger{background:#2a0d0d;color:var(--red);border:1px solid #5a1a1a;border-radius:7px;padding:6px 12px;font-size:12px;cursor:pointer;}
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:500;align-items:flex-end;justify-content:center;}
 .modal-overlay.open{display:flex;}
@@ -148,7 +148,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
       <div class="field-label">Energietr&#228;ger</div>
       <div class="btn-group">
         <button class="btn-choice active" id="btn_gas" onclick="setEnergie('gas')">&#128293; Gas</button>
-        <button class="btn-choice" id="btn_oel" onclick="setEnergie('oel')">&#128707; &#214;l</button>
+        <button class="btn-choice" id="btn_oel" onclick="setEnergie('oel')">&#x1F6E2;&#xFE0F; &#214;l</button>
         <button class="btn-choice" id="btn_strom" onclick="setEnergie('strom')">&#9889; Strom</button>
       </div>
     </div>
@@ -158,10 +158,27 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
       <div class="field"><div class="field-label">Gaspreis <span class="field-unit">[&#8364;/kWh]</span></div><input class="field-input" type="number" id="gas_preis" placeholder="0.112" step="0.001" value="0.112"></div>
     </div>
     <div id="block_oel" class="hidden">
-      <div class="field"><div class="field-label">&#214;lverbrauch <span class="field-unit">[Liter/Jahr]</span></div><input class="field-input" type="number" id="oel_liter" placeholder="3000" oninput="calcOel()"></div>
-      <div class="field"><div class="field-label">Gesamtkosten &#214;l <span class="field-unit">[&#8364;/Jahr]</span></div><input class="field-input" type="number" id="oel_kosten" placeholder="2700" oninput="calcOel()"></div>
-      <div class="field"><div class="field-label">= &#214;lpreis</div><div class="result-value val-blue" id="oel_preis_display" style="font-size:13px;">&#8212; &#8364;/L</div></div>
-      <div class="field"><div class="field-label">= Verbrauch kWh</div><div class="result-value val-blue" id="oel_kwh_display" style="font-size:13px;">&#8212; kWh</div></div>
+      <div class="field">
+        <div class="field-label">&#214;lverbrauch <span class="field-unit">[Liter/Jahr]</span></div>
+        <input class="field-input" type="number" id="oel_liter" placeholder="2000" oninput="calcOel()">
+      </div>
+      <div class="field">
+        <div class="field-label">Preis je 100 Liter <span class="field-unit">[&#8364;]</span></div>
+        <input class="field-input" type="number" id="oel_preis100" placeholder="112.00" step="0.50" value="112.00" oninput="calcOel()">
+      </div>
+      <div class="field">
+        <div class="field-label">= Preis je Liter</div>
+        <div class="result-value val-blue" id="oel_preis_display" style="font-size:13px;">&#8212; &#8364;/L</div>
+      </div>
+      <div class="field">
+        <div class="field-label">= Jahreskosten &#214;l</div>
+        <div class="result-value val-orange" id="oel_kosten_display" style="font-size:13px;">&#8212; &#8364;</div>
+      </div>
+      <div class="field">
+        <div class="field-label">= Verbrauch in kWh</div>
+        <div class="result-value val-blue" id="oel_kwh_display" style="font-size:13px;">&#8212; kWh</div>
+      </div>
+      <p class="note">&#128161; Standardpreis 112,&#8364;/100L (Bundesdurchschnitt Juni 2026). Anpassbar.</p>
     </div>
     <div id="block_strom" class="hidden">
       <div class="field"><div class="field-label">Stromverbrauch Heizung <span class="field-unit">[kWh/Jahr]</span></div><input class="field-input" type="number" id="strom_kwh" placeholder="5000"></div>
@@ -216,7 +233,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
       <tr><td>A2/W35</td><td>+2&#176;C</td><td>35&#176;C</td><td><input type="number" id="cop_a2" placeholder="3.5" step="0.1" oninput="updateCopPreview()"></td></tr>
       <tr><td>A7/W35</td><td>+7&#176;C</td><td>35&#176;C</td><td><input type="number" id="cop_a7" placeholder="4.2" step="0.1" oninput="updateCopPreview()"></td></tr>
     </table>
-    <div class="field" style="margin-top:10px;"><div class="field-label">Errechneter Jahres-COP</div><div class="result-value val-green" id="cop_jahres_preview">&#8212;</div></div>
+    <p class="note" style="margin-top:8px;">&#8505;&#65039; Normwerte nach EN&nbsp;14511 bei W35. Jahres-COP wird anhand Ihrer Vorlauftemperatur aus Tab&nbsp;1 korrigiert.</p>
+    <div class="field" style="margin-top:8px;"><div class="field-label">Vorlauftemperatur Kunde</div><div class="result-value val-blue" id="wp_vorlauf_spiegel" style="font-size:13px;">&#8212;</div></div>
+    <div class="field"><div class="field-label">Korrekturfaktor</div><div class="result-value val-blue" id="cop_faktor_display" style="font-size:13px;">&#8212;</div></div>
+    <div class="field"><div class="field-label" style="font-weight:700;">Errechneter Jahres-COP</div><div class="result-value val-green" id="cop_jahres_preview">&#8212;</div></div>
     <div class="field"><div class="field-label">Nennleistung <span class="field-unit">[kW]</span></div><input class="field-input" type="number" id="wp_leistung" placeholder="8.0" step="0.5"></div>
     <div class="field"><div class="field-label">WP-Typ</div>
       <select class="field-select" id="wp_typ">
@@ -231,6 +251,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
         <option value="2">2&#215; Kaskade</option>
       </select>
     </div>
+    <div id="cop_optimierung" class="hidden note" style="margin-top:8px;color:var(--green);"></div>
   </div>
   <div class="card">
     <div class="card-title">Inneneinheit</div>
@@ -422,7 +443,7 @@ var SZENARIO_FAKTOR = { real:1.0, kons:1.15, worst:1.25 };
 var SZENARIO_TEXT = {
   real:  '&#127919; Realistisch – Standardberechnung nach Faustformel',
   kons:  '&#128737;&#65039; Konservativ (+15%) – kalte Winter, höherer Warmwasserverbrauch',
-  worst: '&#9888;&#65039; Worst Case (+25%) – für kritische Kunden und harte Bedingungen'
+  worst: '&#9888;&#65039; Worst Case (+25%) – kalter Winter, hoher Warmwasserverbrauch, schlechte Dämmung'
 };
 
 function setSzenario(s) {
@@ -443,7 +464,7 @@ var MONATE = ['Jan','Feb','M\u00e4r','Apr','Mai','Jun','Jul','Aug','Sep','Okt','
 var VORLAUF_FAKTOR = {35:1.00,45:0.90,55:0.78,65:0.67,70:0.60,75:0.53};
 var COP_GEWICHT = {am7:0.10,a2:0.35,a7:0.55};
 
-loadGeraete(); renderGeraeteListe(); togglePV(); updateVorlaufHinweis();
+loadGeraete(); renderGeraeteListe(); togglePV(); updateVorlaufHinweis(); updateCopPreview();
 
 function switchTab(i){
   document.querySelectorAll('.tab').forEach(function(t,j){t.classList.toggle('active',i===j);});
@@ -461,9 +482,13 @@ function syncGas(from){
 }
 function calcOel(){
   var l=parseFloat(document.getElementById('oel_liter').value)||0;
-  var k=parseFloat(document.getElementById('oel_kosten').value)||0;
-  document.getElementById('oel_preis_display').textContent=l>0&&k>0?(k/l).toFixed(3)+' \u20ac/L':'-- \u20ac/L';
-  document.getElementById('oel_kwh_display').textContent=l>0?Math.round(l*9.8).toLocaleString('de-DE')+' kWh':'-- kWh';
+  var p100=parseFloat(document.getElementById('oel_preis100').value)||112.0;
+  var preisLiter=p100/100;
+  var kosten=l*preisLiter;
+  var kwh=l*9.8;
+  document.getElementById('oel_preis_display').textContent=preisLiter.toFixed(3)+' €/L';
+  document.getElementById('oel_kosten_display').textContent=l>0?Math.round(kosten).toLocaleString('de-DE')+' €':'-- €';
+  document.getElementById('oel_kwh_display').textContent=l>0?Math.round(kwh).toLocaleString('de-DE')+' kWh':'-- kWh';
 }
 function setInnensystem(typ){
   state.innensystem=typ;
@@ -472,8 +497,41 @@ function setInnensystem(typ){
   document.getElementById('getrennt_info').classList.toggle('hidden',typ!=='getrennt');
 }
 function togglePV(){var on=document.getElementById('pv_aktiv').checked;document.getElementById('pv_section').classList.toggle('hidden',!on);}
-function updateVorlaufHinweis(){var vl=parseInt(document.getElementById('p_vorlauf').value)||55;document.getElementById('vorlauf_hinweis').classList.toggle('hidden',vl<65);}
-function updateCopPreview(){var c=calcJahresCop();document.getElementById('cop_jahres_preview').textContent=c?c.toFixed(2):'--';}
+function updateVorlaufHinweis(){
+  var vl=parseInt(document.getElementById('p_vorlauf').value)||55;
+  document.getElementById('vorlauf_hinweis').classList.toggle('hidden',vl<65);
+  updateCopPreview();
+}
+function updateCopPreview(){
+  var c=calcJahresCop();
+  document.getElementById('cop_jahres_preview').textContent=c?c.toFixed(2):'--';
+
+  // Vorlauf-Spiegel in Tab 2 aktualisieren
+  var vl=parseInt(document.getElementById('p_vorlauf').value)||55;
+  var vlText={35:'35°C – Fußboden',45:'45°C – Gemischt',55:'55°C – Heizkörper',65:'65°C – Heizkörper',70:'70°C – Heizkörper ⚠️',75:'75°C – sehr hoch ⚠️'};
+  var spiegelEl=document.getElementById('wp_vorlauf_spiegel');
+  if(spiegelEl) spiegelEl.textContent=vlText[vl]||vl+'°C';
+  var faktorEl=document.getElementById('cop_faktor_display');
+  if(faktorEl){var fakt=VORLAUF_FAKTOR[vl]||0.78;faktorEl.textContent=fakt.toFixed(2)+' (bei '+vl+'°C Vorlauf)';}
+
+  // Optimierungshinweis
+  var optEl=document.getElementById('cop_optimierung');
+  if(optEl && c){
+    if(vl>=45){
+      // Zeige was bei 35°C möglich wäre
+      var faktor35=VORLAUF_FAKTOR[35]||1.0;
+      var faktorAkt=VORLAUF_FAKTOR[vl]||0.78;
+      var copOptimal=(c/faktorAkt)*faktor35;
+      var nextVl=vl>=55?45:35;
+      var faktorNext=VORLAUF_FAKTOR[nextVl]||0.90;
+      var copNext=(c/faktorAkt)*faktorNext;
+      optEl.classList.remove('hidden');
+      optEl.innerHTML='⚡ Optimierungspotenzial: Bei Absenkung auf '+nextVl+'°C → COP ca. <strong>'+copNext.toFixed(2)+'</strong> &nbsp;|&nbsp; Bei 35°C → COP ca. <strong>'+copOptimal.toFixed(2)+'</strong>';
+    } else {
+      optEl.classList.add('hidden');
+    }
+  }
+}
 function calcJahresCop(){
   var vl=parseInt(document.getElementById('p_vorlauf').value)||55;
   var f=VORLAUF_FAKTOR[vl]||0.78;
